@@ -1,55 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'src/app_theme.dart';
+import 'src/navigation/app_router.dart';
+import 'src/providers/auth_provider.dart';
+import 'src/providers/cart_provider.dart';
+import 'src/providers/event_provider.dart';
+import 'src/providers/booking_provider.dart';
+import 'src/screens/splash_screen.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env'); // optional, used for future API keys
+  final prefs = await SharedPreferences.getInstance();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AI Build Tool',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'ticket_booking_frontend'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'ticket_booking_frontend App is being generated...',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(),
-          ],
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>(
+          create: (_) => AuthProvider(prefs: prefs)..restoreSession(),
         ),
-      ),
+        ChangeNotifierProvider<EventProvider>(
+          create: (_) => EventProvider()..loadInitial(),
+        ),
+        ChangeNotifierProvider<CartProvider>(
+          create: (_) => CartProvider(),
+        ),
+        ChangeNotifierProvider<BookingProvider>(
+          create: (_) => BookingProvider(prefs: prefs)..loadHistory(),
+        ),
+      ],
+      child: const TicketBookingApp(),
+    ),
+  );
+}
+
+class TicketBookingApp extends StatelessWidget {
+  const TicketBookingApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final router = AppRouter.buildRouter(context);
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Ticket Booker',
+      theme: AppTheme.lightTheme,
+      onGenerateRoute: router.onGenerateRoute,
+      initialRoute: SplashScreen.routeName,
     );
   }
 }

@@ -1,16 +1,25 @@
 # ticket_booking_frontend
 
-A new Flutter project.
+Mobile frontend for browsing, booking, and managing event tickets. Features include:
+- User registration/login
+- Browse, search, and filter events
+- Seat selection
+- Add to cart
+- Checkout and Stripe-ready payment service (mocked)
+- Booking confirmation and digital ticket
+- Booking history
+- Profile management
 
-## Getting Started
+## Run
+- flutter pub get
+- flutter run
 
-This project is a starting point for a Flutter application.
+## Environment variables
+Create `.env` (optional, used for future Stripe integration):
+```
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+```
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Notes
+- PaymentService is mocked to avoid external dependencies. When ready to integrate Stripe, add a Stripe Flutter package, supply the publishable key via `.env`, and replace PaymentService.pay with real calls.
+- Booking history is stored locally using SharedPreferences for demo purposes.
