@@ -1,1 +1,3 @@
-# event-and-ticket-booking-app-17254
+# Project Repository
+
+This is the initial README file for the project.
